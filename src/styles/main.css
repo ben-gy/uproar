@@ -1,0 +1,688 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later
+ * Copyright (C) 2026 Ben Richardson — https://benrichardson.dev
+ * See ADDITIONAL-TERMS.md for the section 7(b) attribution requirement. */
+/* Uproar — party loudness game. Dark neon-poster theme. */
+
+:root {
+  --ink: #0e1230;
+  --ink2: #191f4a;
+  --panel: #212a63;
+  --line: #34407e;
+  --text: #f4f6ff;
+  --muted: #aab4ee;
+  --cyan: #38e1d6;
+  --good: #6ee787;
+  --bad: #ff6b6b;
+  --amber: #ffb43a;
+  --hot: #ff4d7e;
+  --magenta: #e94bd0;
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* Belt-and-braces: any [hidden] element is truly gone (Safari UA rule isn't
+   !important, so a class that also sets display would otherwise win). */
+[hidden] {
+  display: none !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: max(14px, env(safe-area-inset-top)) 16px 16px;
+}
+
+.site-footer {
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+}
+
+.site-footer a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+body.playing .site-footer {
+  display: none !important;
+}
+
+/* ── Typography / headings ─────────────────────────────────────────────── */
+.brand {
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  font-size: clamp(2.4rem, 12vw, 3.6rem);
+  margin: 8px 0 2px;
+  background: linear-gradient(90deg, var(--amber), var(--hot), var(--magenta));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-align: center;
+  line-height: 1;
+}
+
+.tagline {
+  color: var(--text);
+  text-align: center;
+  font-size: 1.02rem;
+  margin: 0 0 6px;
+}
+
+.sub {
+  color: var(--muted);
+  text-align: center;
+  font-size: 0.9rem;
+  margin: 0 0 18px;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin: 4px 0 12px;
+  text-align: center;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.btn {
+  appearance: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: linear-gradient(180deg, #ffd27a, var(--amber));
+  padding: 15px 20px;
+  min-height: 52px;
+  width: 100%;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.08s ease, filter 0.12s ease;
+}
+
+.btn:active {
+  transform: translateY(2px) scale(0.99);
+}
+
+.btn.big {
+  font-size: 1.3rem;
+  min-height: 64px;
+}
+
+.btn.secondary {
+  background: var(--panel);
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--cyan);
+  border-color: var(--line);
+  font-weight: 700;
+}
+
+.btn.hot {
+  background: linear-gradient(180deg, var(--hot), var(--magenta));
+  color: #fff;
+}
+
+.stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.row .btn {
+  width: auto;
+  flex: 1;
+}
+
+/* ── Menu ──────────────────────────────────────────────────────────────── */
+.menu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.card {
+  background: var(--ink2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  width: 100%;
+  box-shadow: var(--shadow);
+}
+
+/* ── Mode picker ───────────────────────────────────────────────────────── */
+.modes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.mode-opt {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 2px solid var(--line);
+  background: var(--ink2);
+  color: var(--text);
+  cursor: pointer;
+  width: 100%;
+}
+
+.mode-opt[aria-pressed='true'] {
+  border-color: var(--cyan);
+  background: var(--panel);
+}
+
+.mode-opt .mode-name {
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.mode-opt .mode-blurb {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+/* ── Player setup ──────────────────────────────────────────────────────── */
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.player-row input {
+  flex: 1;
+  font: inherit;
+  font-size: 1rem;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--text);
+  min-height: 44px;
+}
+
+.player-row .rm {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Game screen ───────────────────────────────────────────────────────── */
+.game {
+  width: 100%;
+  height: calc(var(--vh, 1vh) * 100 - 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: max(8px, env(safe-area-inset-top)) 4px calc(6px + env(safe-area-inset-bottom));
+}
+
+.game-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.icon-btn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  background: var(--ink2);
+  border: 2px solid var(--line);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.chip .cdot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.chip.current {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(56, 225, 214, 0.25);
+}
+
+.chip.out {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.turn-banner {
+  text-align: center;
+}
+
+.turn-banner .who {
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.turn-banner .target {
+  color: var(--cyan);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.prompt {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  min-height: 1.2em;
+}
+
+.prompt b {
+  color: var(--amber);
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
+
+/* Meter + pad area grows to fill */
+.stage {
+  flex: 1 1 auto;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 0;
+}
+
+.meter {
+  position: relative;
+  width: min(46vw, 200px);
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #12173a, #0b0e26);
+  border: 2px solid var(--line);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.meter.pad {
+  cursor: pointer;
+  border-color: var(--amber);
+}
+
+.meter-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0%;
+  background: linear-gradient(0deg, var(--amber), var(--hot) 60%, var(--magenta));
+  transition: height 0.05s linear;
+  box-shadow: 0 0 24px rgba(255, 77, 126, 0.5);
+}
+
+.meter-target {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  height: 4px;
+  background: var(--cyan);
+  bottom: 0%;
+  box-shadow: 0 0 10px rgba(56, 225, 214, 0.9);
+  z-index: 3;
+}
+
+.meter-target::after {
+  content: attr(data-label);
+  position: absolute;
+  right: 6px;
+  top: -20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--cyan);
+  white-space: nowrap;
+}
+
+.meter-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0%;
+  height: 0%;
+  background: rgba(56, 225, 214, 0.18);
+  border-top: 3px solid var(--cyan);
+  border-bottom: 3px solid var(--cyan);
+  z-index: 2;
+}
+
+.meter-reading {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--text);
+  z-index: 4;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.pad-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
+  z-index: 4;
+  pointer-events: none;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.game-bottom {
+  flex-shrink: 0;
+}
+
+/* Countdown overlay */
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.countdown span {
+  font-size: clamp(5rem, 30vw, 10rem);
+  font-weight: 900;
+  color: var(--amber);
+  text-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+  animation: pop 0.5s ease;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Result flash */
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  font-weight: 900;
+  animation: flashfade 1.1s ease forwards;
+}
+
+.flash .big {
+  font-size: clamp(2.5rem, 16vw, 5rem);
+}
+
+.flash .sm {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.flash.pass {
+  background: radial-gradient(circle, rgba(110, 231, 135, 0.28), transparent 70%);
+  color: var(--good);
+}
+
+.flash.fail {
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.28), transparent 70%);
+  color: var(--bad);
+}
+
+@keyframes flashfade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* ── Results ───────────────────────────────────────────────────────────── */
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin: 8px 0 16px;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--ink2);
+  border: 1px solid var(--line);
+}
+
+.result-row.winner {
+  border-color: var(--amber);
+  background: var(--panel);
+}
+
+.result-row .rank {
+  font-weight: 900;
+  width: 28px;
+  color: var(--muted);
+}
+
+.result-row .nm {
+  flex: 1;
+  font-weight: 700;
+}
+
+.result-row .score {
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+.results-feedback {
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font: inherit;
+  padding: 6px;
+}
+
+/* ── How to / about text ───────────────────────────────────────────────── */
+.prose {
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 0.98rem;
+}
+
+.prose p {
+  margin: 0 0 12px;
+}
+
+.prose .hi {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.disclosure {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.badge-input {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 6px;
+  min-height: 1.1em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .countdown span,
+  .flash,
+  .shake,
+  .meter-fill {
+    animation: none !important;
+    transition: none !important;
+  }
+}

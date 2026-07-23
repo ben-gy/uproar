@@ -1,0 +1,25 @@
+{
+  "name": "uproar",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Pass the phone and get louder than the last person — the mic keeps score, your nerve runs out first.",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ben-gy/game-engine": "github:ben-gy/gh-game-engine#v1.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "vitest": "^2.0.0",
+    "@types/node": "^22.0.0",
+    "jsdom": "^25.0.0"
+  }
+}

@@ -1,0 +1,16 @@
+Uproar — third-party notices
+=============================
+
+Uproar bundles the following third-party component. This list is derived from the
+sources actually present in the production bundle, not the full dependency tree.
+Uproar has no networked multiplayer, so the engine's optional peer-to-peer stack
+(Trystero and its crypto) is not bundled.
+
+@ben-gy/game-engine
+  The shared game engine for the gh-game-factory fleet.
+  Source:  https://github.com/ben-gy/gh-game-engine
+  Licence: GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)
+
+Uproar itself is licensed under the AGPL-3.0-or-later with a section 7(b)
+attribution term. See LICENSE and ADDITIONAL-TERMS.md in the source repository:
+https://github.com/ben-gy/uproar
