@@ -16,7 +16,6 @@ import './styles/main.css';
 import { hardenViewport } from '@ben-gy/game-engine/mobile';
 import { createSfx } from '@ben-gy/game-engine/sound';
 import { createStore } from '@ben-gy/game-engine/storage';
-import { mountFeedback, openFeedback } from './feedback';
 
 import { MODE_LIST, modeOf, describeChallenge, type Mode } from './modes';
 import type { ModeId, Challenge, Sample, AttemptResult } from './loudness';
@@ -635,7 +634,7 @@ class GameSession {
     fb.type = 'button';
     fb.textContent = 'Something feel off? Tell me →';
     fb.addEventListener('click', (e) =>
-      openFeedback({ returnFocusTo: e.currentTarget as HTMLElement }),
+      (window as any).feedback?.open({ returnFocusTo: e.currentTarget as HTMLElement }),
     );
     main.append(fb);
   }
@@ -674,6 +673,5 @@ class GameSession {
 
 // ── Boot ───────────────────────────────────────────────────────────────────
 hardenViewport();
-mountFeedback();
 if (store.get('seenHowTo', false)) showMenu();
 else showHowTo();
